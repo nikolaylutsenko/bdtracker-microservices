@@ -1,9 +1,9 @@
-FROM mcr.microsoft.com/dotnet/aspnet:7.0-jammy AS base
+FROM mcr.microsoft.com/dotnet/aspnet:7.0-alpine AS base
 EXPOSE 5091
 
 ENV ASPNETCORE_URLS=http://+:5091
 
-FROM mcr.microsoft.com/dotnet/sdk:7.0-jammy AS build
+FROM mcr.microsoft.com/dotnet/sdk:7.0-alpine AS build
 WORKDIR /src
 COPY BdTracker.sln ./
 COPY ./BdTracker.Users/BdTracker.Users.csproj ./BdTracker.Users/
