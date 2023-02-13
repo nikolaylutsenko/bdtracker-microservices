@@ -1,16 +1,15 @@
-﻿using BdTracker.Back.Services.Interfaces;
-using BdTracker.Shared.Entities;
+﻿using BdTracker.Shared.Entities;
+using BdTracker.Shared.Services.Interfaces;
 using Microsoft.EntityFrameworkCore;
-using BdTracker.Back.Data;
 
-namespace GameStore.Core.Services
+namespace BdTracker.Shared.Services
 {
     public class Service<T> : IService<T> where T : BaseEntity
     {
-        private readonly AppDbContext _context;
+        private readonly DbContext _context;
         private readonly DbSet<T> _dbSet;
 
-        public Service(AppDbContext context)
+        public Service(DbContext context)
         {
             _dbSet = context.Set<T>();
             _context = context;

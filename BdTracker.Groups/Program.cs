@@ -1,9 +1,31 @@
+using BdTracker.Groups.Data;
+using BdTracker.Groups.Dtos.Responses;
+using BdTracker.Groups.Infrastructure;
+using BdTracker.Shared.Entities;
+using BdTracker.Shared.Services;
+using BdTracker.Shared.Services.Interfaces;
+using MapsterMapper;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
+using Npgsql;
+
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
-// Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
+var dataSourceBuilder = new NpgsqlDataSourceBuilder(builder.Configuration["PostgreSQL:ConnectionName"]);
+await using var dataSource = dataSourceBuilder.Build();
+builder.Services.AddDbContext<AppDbContext>(options =>
+{
+    options.UseNpgsql(dataSource)/*.UseQueryTrackingBehavior(QueryTrackingBehavior.NoTracking)*/;
+});
+
+builder.Services.AddMapster();
+
+builder.Services.AddScoped(typeof(DbContext), typeof(AppDbContext));
+builder.Services.AddTransient(typeof(IService<>), typeof(Service<>));
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
+
+builder.Services.AddRouting(option => option.LowercaseUrls = true);
 
 var app = builder.Build();
 
@@ -16,6 +38,14 @@ if (app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 
+app.MapGet("/", async ([FromServices] IService<Group> groupsRepository, [FromServices] IMapper mapper) =>
+{
+    var groups = await groupsRepository.GetAllAsync();
+    return mapper.Map<List<GroupDto>>(groups);
+})
+    .WithName("GetAllGroups")
+    .WithOpenApi();
+
 var summaries = new[]
 {
     "Freezing", "Bracing", "Chilly", "Cool", "Mild", "Warm", "Balmy", "Hot", "Sweltering", "Scorching"
@@ -23,7 +53,7 @@ var summaries = new[]
 
 app.MapGet("/weatherforecast", () =>
 {
-    var forecast =  Enumerable.Range(1, 5).Select(index =>
+    var forecast = Enumerable.Range(1, 5).Select(index =>
         new WeatherForecast
         (
             DateOnly.FromDateTime(DateTime.Now.AddDays(index)),

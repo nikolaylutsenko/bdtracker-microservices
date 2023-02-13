@@ -1,9 +1,9 @@
 using System.Text.Json.Serialization;
 using BdTracker.Back.Data;
-using BdTracker.Back.Services.Interfaces;
 using BdTracker.Shared.Entities;
+using BdTracker.Shared.Services;
+using BdTracker.Shared.Services.Interfaces;
 using BdTracker.Users.Helpers;
-using GameStore.Core.Services;
 using Microsoft.AspNetCore.Http.Json;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.OpenApi.Models;

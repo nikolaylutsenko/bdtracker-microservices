@@ -1,6 +1,6 @@
 using AutoMapper;
 using BdTracker.Back.Controllers;
-using BdTracker.Back.Services.Interfaces;
+using BdTracker.Shared.Services.Interfaces;
 using BdTracker.Users.Dtos;
 using BdTracker.Users.Dtos.Requests;
 using BdTracker.Users.Dtos.Responses;
