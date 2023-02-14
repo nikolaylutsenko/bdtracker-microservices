@@ -33,7 +33,7 @@ namespace BdTracker.Back.Data
                 Name = "Super",
                 Surname = "Admin",
                 Sex = Sex.Male,
-                Birthday = new DateTime(1987, 11, 17),
+                Birthday = new DateTime(1987, 11, 17).ToUniversalTime(),
                 Occupation = ".NET Developer",
                 AboutMe = "Passionate programmer",
                 GroupsIds = new List<string> { "986fddc4-471d-436d-a86d-bd56add80ece" },

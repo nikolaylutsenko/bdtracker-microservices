@@ -34,8 +34,8 @@ builder.Services.AddControllers()
         o.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
 
         // serialize DateOnly as strings
-        o.JsonSerializerOptions.Converters.Add(new DateOnlyJsonConverter());
-        o.JsonSerializerOptions.Converters.Add(new NullableDateOnlyJsonConverter());
+        //o.JsonSerializerOptions.Converters.Add(new DateOnlyJsonConverter());
+        //o.JsonSerializerOptions.Converters.Add(new NullableDateOnlyJsonConverter());
     });
 
 builder.Services.AddAutoMapper(typeof(Program));
