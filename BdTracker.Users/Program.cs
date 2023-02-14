@@ -20,6 +20,7 @@ builder.Services.AddDbContext<AppDbContext>(options =>
     options.UseNpgsql(dataSource)/*.UseQueryTrackingBehavior(QueryTrackingBehavior.NoTracking)*/;
 });
 
+builder.Services.AddScoped(typeof(DbContext), typeof(AppDbContext));
 builder.Services.AddTransient(typeof(IService<>), typeof(Service<>));
 
 // builder.Services.Configure<JsonOptions>(opt =>

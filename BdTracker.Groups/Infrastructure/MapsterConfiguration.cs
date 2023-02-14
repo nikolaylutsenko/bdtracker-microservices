@@ -1,8 +1,5 @@
-using BdTracker.Groups.Dtos.Responses;
-using BdTracker.Shared.Entities;
 using Mapster;
 using MapsterMapper;
-using Microsoft.Extensions.DependencyInjection;
 
 namespace BdTracker.Groups.Infrastructure;
 
