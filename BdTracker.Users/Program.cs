@@ -1,9 +1,9 @@
 using System.Text.Json.Serialization;
 using BdTracker.Back.Data;
-using BdTracker.Back.Services.Interfaces;
 using BdTracker.Shared.Entities;
+using BdTracker.Shared.Services;
+using BdTracker.Shared.Services.Interfaces;
 using BdTracker.Users.Helpers;
-using GameStore.Core.Services;
 using Microsoft.AspNetCore.Http.Json;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.OpenApi.Models;
@@ -20,6 +20,7 @@ builder.Services.AddDbContext<AppDbContext>(options =>
     options.UseNpgsql(dataSource)/*.UseQueryTrackingBehavior(QueryTrackingBehavior.NoTracking)*/;
 });
 
+builder.Services.AddScoped(typeof(DbContext), typeof(AppDbContext));
 builder.Services.AddTransient(typeof(IService<>), typeof(Service<>));
 
 // builder.Services.Configure<JsonOptions>(opt =>
@@ -33,8 +34,8 @@ builder.Services.AddControllers()
         o.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
 
         // serialize DateOnly as strings
-        o.JsonSerializerOptions.Converters.Add(new DateOnlyJsonConverter());
-        o.JsonSerializerOptions.Converters.Add(new NullableDateOnlyJsonConverter());
+        //o.JsonSerializerOptions.Converters.Add(new DateOnlyJsonConverter());
+        //o.JsonSerializerOptions.Converters.Add(new NullableDateOnlyJsonConverter());
     });
 
 builder.Services.AddAutoMapper(typeof(Program));
