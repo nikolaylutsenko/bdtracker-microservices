@@ -2,13 +2,13 @@ using BdTracker.Groups.Data;
 using BdTracker.Groups.Dtos.Requests;
 using BdTracker.Groups.Dtos.Responses;
 using BdTracker.Shared.Infrastructure;
-using BdTracker.Shared.Entities;
 using BdTracker.Shared.Services;
 using BdTracker.Shared.Services.Interfaces;
 using MapsterMapper;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Npgsql;
+using BdTracker.Groups.Entities;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -50,8 +50,7 @@ app.MapGet("/groups", async ([FromServices] AppDbContext context, [FromServices]
 app.MapGet("/groups/{id:guid}", async (Guid id, [FromServices] AppDbContext context, [FromServices] IMapper mapper) =>
 {
     var group = await context.Groups.FindAsync(id);
-    if (group == null) return Results.NotFound();
-    return Results.Ok(mapper.Map<GroupResponse>(group));
+    return group == null ? Results.NotFound() : Results.Ok(mapper.Map<GroupResponse>(group));
 })
 .WithName("GetSingleGroup")
 .Produces<GroupResponse>()

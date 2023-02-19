@@ -1,7 +1,7 @@
 FROM mcr.microsoft.com/dotnet/aspnet:7.0-alpine AS base
-EXPOSE 5091
+EXPOSE 7772
 
-ENV ASPNETCORE_URLS=http://+:5091
+ENV ASPNETCORE_URLS=http://+:7772
 
 FROM mcr.microsoft.com/dotnet/sdk:7.0-alpine AS build
 WORKDIR /src
