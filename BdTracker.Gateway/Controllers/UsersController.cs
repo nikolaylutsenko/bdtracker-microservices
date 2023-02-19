@@ -10,8 +10,11 @@ namespace BdTracker.Gateway.Controllers;
 [Route("api/v1/[controller]")]
 public class UsersController : ControllerBase
 {
-    public UsersController()
+    private readonly IHttpClientFactory _httpClientFactory;
+
+    public UsersController(IHttpClientFactory httpClientFactory)
     {
+        _httpClientFactory = httpClientFactory;
     }
 
     [HttpGet]

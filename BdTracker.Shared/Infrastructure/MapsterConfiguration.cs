@@ -1,7 +1,8 @@
 using Mapster;
 using MapsterMapper;
+using Microsoft.Extensions.DependencyInjection;
 
-namespace BdTracker.Groups.Infrastructure;
+namespace BdTracker.Shared.Infrastructure;
 
 public static class MapsterConfiguration
 {
