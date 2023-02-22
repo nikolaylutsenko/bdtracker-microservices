@@ -41,6 +41,6 @@ public class UserConfiguration : IEntityTypeConfiguration<User>
             .IsRequired();
 
         builder.HasIndex(x => x.WishlistId)
-        .IsUnique();
+            .IsUnique();
     }
 }
