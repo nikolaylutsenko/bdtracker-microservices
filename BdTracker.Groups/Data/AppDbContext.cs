@@ -1,6 +1,5 @@
-﻿using BdTracker.Shared.Entities;
+﻿using BdTracker.Groups.Entities;
 using Microsoft.EntityFrameworkCore;
-using Npgsql;
 
 namespace BdTracker.Groups.Data
 {

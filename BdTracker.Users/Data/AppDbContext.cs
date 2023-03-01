@@ -36,10 +36,9 @@ namespace BdTracker.Back.Data
                 Birthday = new DateTime(1987, 11, 17).ToUniversalTime(),
                 Occupation = ".NET Developer",
                 AboutMe = "Passionate programmer",
-                GroupsIds = new List<string> { "986fddc4-471d-436d-a86d-bd56add80ece" },
-                WishlistId = Guid.Parse("ac8b9e86-218f-48ff-91fd-cff13101eae2") //TODO: add this wishlist
+                GroupsIds = new List<Guid> { Guid.Parse("986fddc4-471d-436d-a86d-bd56add80ece") },
+                WishlistId = Guid.Parse("ac8b9e86-218f-48ff-91fd-cff13101eae2") //TODO: add this wishlist to wishlist service
             });
-            // modelBuilder.ApplyConfigurationsFromAssembly(typeof(AppDbContext).Assembly);
         }
 
         public DbSet<User> Users { get; set; } = default!;

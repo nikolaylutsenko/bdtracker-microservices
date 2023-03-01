@@ -1,4 +1,6 @@
-namespace BdTracker.Shared.Entities;
+using BdTracker.Shared.Entities;
+
+namespace BdTracker.Groups.Entities;
 
 public class Group : BaseEntity
 {

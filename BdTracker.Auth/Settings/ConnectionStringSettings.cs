@@ -1,4 +1,4 @@
-namespace BdTracker.Back.Settings;
+namespace BdTracker.Auth.Settings;
 
 public interface IConnectionStringSettings
 {

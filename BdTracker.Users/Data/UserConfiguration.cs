@@ -10,6 +10,8 @@ public class UserConfiguration : IEntityTypeConfiguration<User>
     {
         builder.ToTable("Users");
 
+        builder.HasKey(x => x.Id);
+
         builder.Property(x => x.Name)
             .HasMaxLength(100)
             .IsRequired();
@@ -31,5 +33,14 @@ public class UserConfiguration : IEntityTypeConfiguration<User>
         builder.Property(x => x.AboutMe)
             .HasMaxLength(1000)
             .IsRequired(false);
+
+        builder.Property(x => x.GroupsIds)
+            .IsRequired();
+
+        builder.Property(x => x.WishlistId)
+            .IsRequired();
+
+        builder.HasIndex(x => x.WishlistId)
+            .IsUnique();
     }
 }
