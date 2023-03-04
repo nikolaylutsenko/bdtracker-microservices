@@ -1,13 +1,13 @@
 using BdTracker.Auth.Data;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
-using BdTracker.Auth.Settings;
 using Microsoft.Extensions.Options;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
 using Npgsql;
 using BdTracker.Shared.Infrastructure;
+using BdTracker.Shared.Settings;
 
 var builder = WebApplication.CreateBuilder(args);
 

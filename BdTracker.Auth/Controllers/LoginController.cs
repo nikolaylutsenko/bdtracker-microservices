@@ -6,10 +6,10 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.IdentityModel.Tokens;
-using BdTracker.Auth.Settings;
 using BdTracker.Auth.Dto.Requests;
 using BdTracker.Auth.Dto.Responses;
 using MapsterMapper;
+using BdTracker.Shared.Settings;
 
 namespace BdTracker.Auth.Controllers;
 

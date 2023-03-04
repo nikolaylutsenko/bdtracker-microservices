@@ -9,6 +9,9 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Npgsql;
 using BdTracker.Groups.Entities;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.IdentityModel.Tokens;
+using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -28,6 +31,30 @@ builder.Services.AddSwaggerGen();
 
 builder.Services.AddRouting(option => option.LowercaseUrls = true);
 
+builder.Services.AddAuthentication(o =>
+{
+    o.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+    o.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+    o.DefaultScheme = JwtBearerDefaults.AuthenticationScheme;
+}).AddJwtBearer(o =>
+{
+    o.TokenValidationParameters = new TokenValidationParameters
+    {
+        ValidateIssuer = true,
+        ValidateAudience = true,
+        ValidateLifetime = false,
+        ValidateIssuerSigningKey = true,
+        ValidIssuer = builder.Configuration["Authentication:Issuer"],
+        ValidAudience = builder.Configuration["Authentication:Audience"],
+        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["Authentication:Key"]!))
+    };
+});
+
+builder.Services.AddAuthorizationBuilder()
+    .AddPolicy("UserPolicy", policy => policy.RequireRole("User"))
+    .AddPolicy("AdminPolicy", policy => policy.RequireRole("Admin"))
+    .AddPolicy("SuperAdminPolicy", policy => policy.RequireRole("SuperAdmin"));
+
 var app = builder.Build();
 
 if (app.Environment.IsDevelopment())
@@ -36,27 +63,32 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 
+app.UseAuthorization();
+app.UseAuthorization();
+
 app.UseHttpsRedirection();
 
-app.MapGet("/groups", async ([FromServices] AppDbContext context, [FromServices] IMapper mapper) =>
+app.MapGet("api/v1/groups", async ([FromServices] AppDbContext context, [FromServices] IMapper mapper) =>
 {
     var groups = await context.Groups.ToListAsync();
     return mapper.Map<List<GroupResponse>>(groups);
 })
 .WithName("GetAllGroups")
 .Produces<List<GroupResponse>>()
-.WithOpenApi();
+.WithOpenApi()
+.RequireAuthorization("UserPolicy");
 
-app.MapGet("/groups/{id:guid}", async (Guid id, [FromServices] AppDbContext context, [FromServices] IMapper mapper) =>
+app.MapGet("api/v1/groups/{id:guid}", async (Guid id, [FromServices] AppDbContext context, [FromServices] IMapper mapper) =>
 {
     var group = await context.Groups.FindAsync(id);
     return group == null ? Results.NotFound() : Results.Ok(mapper.Map<GroupResponse>(group));
 })
 .WithName("GetSingleGroup")
 .Produces<GroupResponse>()
-.WithOpenApi();
+.WithOpenApi()
+.RequireAuthorization("UserPolicy");
 
-app.MapPost("/groups", async (CreateGroupRequest request, [FromServices] AppDbContext context, [FromServices] IMapper mapper) =>
+app.MapPost("api/v1/groups", async (CreateGroupRequest request, [FromServices] AppDbContext context, [FromServices] IMapper mapper) =>
 {
     var group = mapper.Map<Group>(request);
     var result = await context.Groups.AddAsync(group);
@@ -65,9 +97,10 @@ app.MapPost("/groups", async (CreateGroupRequest request, [FromServices] AppDbCo
 })
 .WithName("CreateGroup")
 .Produces<GroupResponse>()
-.WithOpenApi();
+.WithOpenApi()
+.RequireAuthorization("UserPolicy");
 
-app.MapPut("/groups/{id:guid}", async (Guid id, UpdateGroupRequest request, [FromServices] AppDbContext context) =>
+app.MapPut("api/v1/groups/{id:guid}", async (Guid id, UpdateGroupRequest request, [FromServices] AppDbContext context) =>
 {
     var rowAffected = await context.Groups.Where(g => g.Id == id)
         .ExecuteUpdateAsync(update =>
@@ -78,9 +111,10 @@ app.MapPut("/groups/{id:guid}", async (Guid id, UpdateGroupRequest request, [Fro
 .WithName("UpdateGroup")
 .Produces(401)
 .Produces(201)
-.WithOpenApi();
+.WithOpenApi()
+.RequireAuthorization("UserPolicy");
 
-app.MapDelete("groups/{id:guid}", async (Guid id, [FromServices] AppDbContext context) =>
+app.MapDelete("api/v1/groups/{id:guid}", async (Guid id, [FromServices] AppDbContext context) =>
 {
     var rowAffected = await context.Groups.Where(g => g.Id == id)
         .ExecuteDeleteAsync();
@@ -90,6 +124,7 @@ app.MapDelete("groups/{id:guid}", async (Guid id, [FromServices] AppDbContext co
 .WithName("DeleteGroup")
 .Produces(404)
 .Produces(201)
-.WithOpenApi();
+.WithOpenApi()
+.RequireAuthorization("UserPolicy");
 
 app.Run();

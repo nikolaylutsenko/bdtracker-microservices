@@ -1,4 +1,4 @@
-﻿namespace BdTracker.Auth.Settings;
+﻿namespace BdTracker.Shared.Settings;
 public interface IAuthSettings
 {
     string Key { get; init; }
