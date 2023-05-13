@@ -43,14 +43,14 @@ public class RegisterController : ControllerBase
 
             if (setRoleResult.Succeeded)
             {
-                return Ok();
+                return Ok(new { user.Id, user.Email });
             }
 
-            return BadRequest();
+            return Problem();
         }
         else
         {
-            return BadRequest();
+            return Problem();
         }
     }
 }

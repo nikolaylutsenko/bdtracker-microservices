@@ -66,9 +66,6 @@ public class LoginController : ControllerBase
             var loginResponse = _mapper.Map<LoginResponse>(identityUsr);
             loginResponse = loginResponse with { Token = stringToken };
 
-            //identityUsr.LoginCounter += 1;
-            //var updateCounterResult = await _userManager.UpdateAsync(identityUsr);
-
             return Ok(loginResponse);
         }
         else

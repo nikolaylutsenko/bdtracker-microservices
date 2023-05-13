@@ -20,7 +20,9 @@ namespace BdTracker.Groups.Data
                 new Group
                 {
                     Id = Guid.Parse("986fddc4-471d-436d-a86d-bd56add80ece"),
-                    Name = "BdTracker Admins"
+                    Name = "BdTracker Admins",
+                    CreatedDate = new DateTime(2023, 3, 10).ToUniversalTime(),
+                    CreatedBy = "Developer"
                 }
             );
             // modelBuilder.ApplyConfigurationsFromAssembly(typeof(AppDbContext).Assembly);

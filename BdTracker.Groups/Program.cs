@@ -12,6 +12,7 @@ using BdTracker.Groups.Entities;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
+using System.Security.Claims;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -51,8 +52,8 @@ builder.Services.AddAuthentication(o =>
 });
 
 builder.Services.AddAuthorizationBuilder()
-    .AddPolicy("UserPolicy", policy => policy.RequireRole("User"))
-    .AddPolicy("AdminPolicy", policy => policy.RequireRole("Admin"))
+    .AddPolicy("UserPolicy", policy => policy.RequireRole("User", "Admin", "SuperAdmin"))
+    .AddPolicy("AdminPolicy", policy => policy.RequireRole("Admin", "SuperAdmin"))
     .AddPolicy("SuperAdminPolicy", policy => policy.RequireRole("SuperAdmin"));
 
 var app = builder.Build();
@@ -68,53 +69,58 @@ app.UseAuthorization();
 
 app.UseHttpsRedirection();
 
-app.MapGet("api/v1/groups", async ([FromServices] AppDbContext context, [FromServices] IMapper mapper) =>
+var groups = app.MapGroup("/api/v1/groups")
+    .WithOpenApi()
+    .RequireAuthorization("UserPolicy");
+
+groups.MapGet("/", async ([FromServices] AppDbContext context, [FromServices] IMapper mapper) =>
 {
     var groups = await context.Groups.ToListAsync();
     return mapper.Map<List<GroupResponse>>(groups);
 })
 .WithName("GetAllGroups")
 .Produces<List<GroupResponse>>()
-.WithOpenApi()
-.RequireAuthorization("UserPolicy");
+.WithTags("Groups");
 
-app.MapGet("api/v1/groups/{id:guid}", async (Guid id, [FromServices] AppDbContext context, [FromServices] IMapper mapper) =>
+groups.MapGet("/{id:guid}", async (Guid id, [FromServices] AppDbContext context, [FromServices] IMapper mapper) =>
 {
     var group = await context.Groups.FindAsync(id);
     return group == null ? Results.NotFound() : Results.Ok(mapper.Map<GroupResponse>(group));
 })
 .WithName("GetSingleGroup")
 .Produces<GroupResponse>()
-.WithOpenApi()
-.RequireAuthorization("UserPolicy");
+.WithTags("Groups");
 
-app.MapPost("api/v1/groups", async (CreateGroupRequest request, [FromServices] AppDbContext context, [FromServices] IMapper mapper) =>
+groups.MapPost("/", async (CreateGroupRequest request, [FromServices] AppDbContext context, [FromServices] IMapper mapper, HttpRequest httpRequest) =>
 {
     var group = mapper.Map<Group>(request);
+    group.CreatedDate = DateTime.UtcNow;
+    group.CreatedBy = httpRequest.HttpContext.User.FindFirst(c => c.Type == "Id")?.Value ?? Guid.Empty.ToString();
     var result = await context.Groups.AddAsync(group);
     await context.SaveChangesAsync();
     return Results.Ok(mapper.Map<GroupResponse>(result.Entity));
 })
 .WithName("CreateGroup")
+.Accepts<CreateGroupRequest>("application/json")
 .Produces<GroupResponse>()
-.WithOpenApi()
-.RequireAuthorization("UserPolicy");
+.WithTags("Groups");
 
-app.MapPut("api/v1/groups/{id:guid}", async (Guid id, UpdateGroupRequest request, [FromServices] AppDbContext context) =>
+groups.MapPut("/{id:guid}", async (Guid id, UpdateGroupRequest request, [FromServices] AppDbContext context, HttpRequest httpRequest) =>
 {
+    var userId = httpRequest.HttpContext.User.FindFirst(c => c.Type == "Id")?.Value ?? Guid.Empty.ToString();
     var rowAffected = await context.Groups.Where(g => g.Id == id)
         .ExecuteUpdateAsync(update =>
-        update.SetProperty(g => g.Name, request.Name));
+            update.SetProperty(g => g.Name, request.Name)
+                  .SetProperty(g => g.EditedBy, userId));
 
     return rowAffected == 0 ? Results.NotFound() : Results.NoContent();
 })
 .WithName("UpdateGroup")
 .Produces(401)
 .Produces(201)
-.WithOpenApi()
-.RequireAuthorization("UserPolicy");
+.WithTags("Groups");
 
-app.MapDelete("api/v1/groups/{id:guid}", async (Guid id, [FromServices] AppDbContext context) =>
+groups.MapDelete("/{id:guid}", async (Guid id, [FromServices] AppDbContext context) =>
 {
     var rowAffected = await context.Groups.Where(g => g.Id == id)
         .ExecuteDeleteAsync();
@@ -124,7 +130,6 @@ app.MapDelete("api/v1/groups/{id:guid}", async (Guid id, [FromServices] AppDbCon
 .WithName("DeleteGroup")
 .Produces(404)
 .Produces(201)
-.WithOpenApi()
-.RequireAuthorization("UserPolicy");
+.WithTags("Groups");
 
 app.Run();

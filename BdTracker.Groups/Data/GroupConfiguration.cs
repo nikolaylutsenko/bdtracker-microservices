@@ -15,5 +15,16 @@ public class GroupConfiguration : IEntityTypeConfiguration<Group>
         builder.Property(x => x.Name)
             .HasMaxLength(255)
             .IsRequired();
+
+        builder.Property(x => x.CreatedDate)
+            .IsRequired();
+
+        builder.Property(x => x.CreatedBy)
+            .HasMaxLength(255)
+            .IsRequired();
+
+        builder.Property(x => x.EditedBy)
+            .HasMaxLength(255)
+            .IsRequired(false);
     }
 }
